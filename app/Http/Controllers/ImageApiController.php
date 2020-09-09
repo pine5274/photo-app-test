@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Image;
+use Storage;
 
 class ImageApiController extends Controller
 {
@@ -36,11 +37,14 @@ class ImageApiController extends Controller
         ]);
 
         if (request()->file) {
-            $file_name = time() . '.' . request()->file->getClientOriginalName();
-            request()->file->storeAs('public', $file_name);
+//            $file_name = time() . '.' . request()->file->getClientOriginalName();
+//            request()->file->storeAs('public', $file_name);
+            $image = $request->file('file');
+            $path = Storage::disk('s3')->put('/', $image, 'public');
 
             $image = new Image();
-            $image->path = 'storage/' . $file_name;
+//            $image->path = 'storage/' . $file_name;
+            $image->path = Storage::disk('s3')->url($path);
             $image->title = $request->title;
             $image->save();
 
